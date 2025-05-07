@@ -1,0 +1,33 @@
+export const RoleEnum = {
+    ADMIN: 'ADMIN',
+    OWNER: 'OWNER',
+    MEMBER: 'MEMBER',
+    GUEST: 'GUEST',
+} as const;
+
+export type RoleEnumType = keyof typeof RoleEnum;
+
+export const PermissionEnum = {
+
+
+    CREATE_WORKSPACE: 'CREATE_WORKSPACE',
+    DELETE_WORKSPACE: 'DELETE_WORKSPACE',
+    EDIT_WORKSPACE: 'EDIT_WORKSPACE',
+    MANAGE_WORKSPACE_SETTINGS: 'MANAGE_WORKSPACE_SETTINGS',
+
+    ADD_MEMBER: 'ADD_MEMBER',
+    CHANGE_MEMBER_ROLE: 'CHANGE_MEMBER_ROLE',
+    REMOVE_MEMBER: 'REMOVE_MEMBER',
+
+    CREATE_PROJECT: 'CREATE_PROJECT',
+    DELETE_PROJECT: 'DELETE_PROJECT',
+    EDIT_PROJECT: 'EDIT_PROJECT',
+
+    CREATE_TASK: 'CREATE_TASK',
+    DELETE_TASK: 'DELETE_TASK',
+    EDIT_TASK: 'EDIT_TASK',
+
+    VIEW_ONLY: 'VIEW_ONLY',
+} as const;
+
+export type PermissionEnumType = keyof typeof PermissionEnum;
