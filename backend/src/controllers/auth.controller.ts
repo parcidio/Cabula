@@ -17,3 +17,7 @@ export const googleLoginCallback = asyncHandler(
         );
     }
 );
+
+export const registerUserControler = asyncHandler(async (req: Request, res: Response) => {
+
+});

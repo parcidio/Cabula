@@ -28,6 +28,7 @@ const userSchema = new Schema<UserDocument>({
     timestamps: true,   
 });
 
+//Middleware to hash password before (pre) saving user
 userSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
         if (this.password) {

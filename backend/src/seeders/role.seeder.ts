@@ -8,7 +8,8 @@ const seedRoles = async () => {
   console.log("Seeding roles started...");
 
   try {
-    await connectDatabase();
+    await connectDatabase(); // Connect to the database
+    console.log("Database connected.");
 
     const session = await mongoose.startSession();
     session.startTransaction();

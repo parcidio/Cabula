@@ -4,8 +4,9 @@ import AccountModel from "../models/account.model";
 import WorkspaceModel from "../models/workspace.model";
 import { RoleEnum } from "../enums/role.enum";
 import RoleModel from "../models/roles-permission.model";
-import { NotFoundException } from "../utils/appError";
+import { BadRequestException, NotFoundException } from "../utils/appError";
 import MemberModel from "../models/member.model";
+import { ProviderEnum } from "../enums/account-provider.enum";
 
 export const loginOrCreateAccountService = async (data: {
     provider: string,
@@ -37,7 +38,7 @@ export const loginOrCreateAccountService = async (data: {
 
             // Create a new account associated with the user
             const account = new AccountModel({
-                user: user._id,
+                userId: user._id,
                 provider: provider,
                 providerId: providerId,
             });
@@ -59,7 +60,7 @@ export const loginOrCreateAccountService = async (data: {
 
             // Create a new member with the owner role for the user in the workspace
             const member = new MemberModel({
-                user: user._id,
+                userId: user._id,
                 workspaceId: workspace._id,
                 role: ownerRole._id,
                 joinedAt: new Date(),
@@ -86,4 +87,80 @@ export const loginOrCreateAccountService = async (data: {
         console.log("Session ended.");
     }
 
+};
+
+export const registerUserService = async (body: {
+  email: string,
+  name: string,
+  password: string,
+}) => {
+    const { email, name, password } = body;
+    const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const existingUser = await UserModel.findOne({ email }).session(session);
+    if (existingUser) {
+      throw new BadRequestException("Email already exists");
+    }
+
+    const user = new UserModel({
+      email,
+      name,
+      password,
+    });
+    await user.save({ session });
+
+    const account = new AccountModel({
+      userId: user._id,
+      provider: ProviderEnum.EMAIL,
+      providerId: email,
+    });
+    await account.save({ session });
+
+    // 3. Create a new workspace for the new user
+    const workspace = new WorkspaceModel({
+      name: `My Workspace`,
+      description: `Workspace created for ${user.name}`,
+      owner: user._id,
+    });
+    await workspace.save({ session });
+
+    const ownerRole = await RoleModel.findOne({
+      name: RoleEnum.OWNER,
+    }).session(session);
+
+    if (!ownerRole) {
+      throw new NotFoundException("Owner role not found");
+    }
+
+    const member = new MemberModel({
+      userId: user._id,
+      workspaceId: workspace._id,
+      role: ownerRole._id,
+      joinedAt: new Date(),
+    });
+    await member.save({ session });
+
+    user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
+    await user.save({ session });
+
+    await session.commitTransaction();
+    console.log("Transaction committed successfully.");
+    console.log("User registered successfully");
+
+    return {
+      userId: user._id,
+      workspaceId: workspace._id,
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    console.error("Error in registerUserService:", error);
+
+    throw error;
+  }finally {
+    session.endSession();
+    console.log("End Session...");
+  }
 };

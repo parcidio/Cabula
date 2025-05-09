@@ -3,7 +3,7 @@ import { ProviderEnum, ProviderEnumType } from '../enums/account-provider.enum';
 
 export interface AccountDocument extends Document {
 provider: ProviderEnumType;
-provicerId: string;
+providerId: string;
 userId: mongoose.Types.ObjectId;
 refreshToken: string | null;
 tokenExpiry: Date | null;
@@ -12,7 +12,7 @@ createdAt: Date;
 
 const accountSchema = new Schema<AccountDocument>({
     provider: { type: String, required: true, enum: Object.values(ProviderEnum) },
-    provicerId: { type: String, required: true, unique: true },
+    providerId: { type: String, required: true, unique: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     refreshToken: { type: String, default: null },
     tokenExpiry: { type: Date, default: null },

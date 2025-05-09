@@ -21,12 +21,13 @@ import authRoutes from "./routes/auth.route";
 //import projectRoutes from "./routes/project.route";
 //import taskRoutes from "./routes/task.route";
 
+// Create an Express application that will handle incoming requests and responses
 const app = express();
-const BASE_PATH = config.BASE_PATH;
+const BASE_PATH = config.BASE_PATH; // Base path for API routes
 
-app.use(express.json());
+app.use(express.json()); // Middleware to parse JSON request bodies
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded request bodies
 
 app.use(
   session({
@@ -37,11 +38,13 @@ app.use(
     httpOnly: true,
     sameSite: "lax",
   })
-);
+); // Middleware to handle session management using cookies in the browser 
 
+// Initialize passport middleware and session
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Middleware to handle CORS
 app.use(
   cors({
     origin: config.FRONTEND_ORIGIN,
@@ -49,6 +52,8 @@ app.use(
   })
 );
 
+
+// Page routing
 app.get(
   `/`,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -63,6 +68,7 @@ app.get(
   })
 );
 
+// API routing
 app.use(`${BASE_PATH}/auth`, authRoutes);
 //app.use(`${BASE_PATH}/user`, isAuthenticated, userRoutes);
 //app.use(`${BASE_PATH}/workspace`, isAuthenticated, workspaceRoutes);
@@ -70,9 +76,12 @@ app.use(`${BASE_PATH}/auth`, authRoutes);
 //app.use(`${BASE_PATH}/project`, isAuthenticated, projectRoutes);
 //app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
 
+// Error handling middleware
 app.use(errorHandler);
 
+// Health check route and server initialization
 app.listen(config.PORT, async () => {
   console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
-  await connectDatabase();
+  await connectDatabase(); //Start the database connection
+  console.log("Database connected successfully");
 });
