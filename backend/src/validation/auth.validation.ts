@@ -1,3 +1,7 @@
+/*
+validation schemas for user authentication request data before processing requests
+*/
+
 import { z } from "zod";
 
 export const emailSchema = z

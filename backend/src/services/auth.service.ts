@@ -4,7 +4,7 @@ import AccountModel from "../models/account.model";
 import WorkspaceModel from "../models/workspace.model";
 import { RoleEnum } from "../enums/role.enum";
 import RoleModel from "../models/roles-permission.model";
-import { BadRequestException, NotFoundException } from "../utils/appError";
+import { BadRequestException, NotFoundException, UnauthorizedException } from "../utils/appError";
 import MemberModel from "../models/member.model";
 import { ProviderEnum } from "../enums/account-provider.enum";
 
@@ -100,9 +100,17 @@ export const registerUserService = async (body: {
   try {
     session.startTransaction();
 
+    // Check if the user already exists in the database
     const existingUser = await UserModel.findOne({ email }).session(session);
     if (existingUser) {
       throw new BadRequestException("Email already exists");
+    }
+
+    
+    // Check if an account with the same providerId already exists
+    const existingAccount = await AccountModel.findOne({ providerId: email }).session(session);
+    if (existingAccount) {
+      throw new BadRequestException("Account with this email already exists");
     }
 
     const user = new UserModel({
@@ -117,9 +125,10 @@ export const registerUserService = async (body: {
       provider: ProviderEnum.EMAIL,
       providerId: email,
     });
+    console.log("Account created:", account);
     await account.save({ session });
 
-    // 3. Create a new workspace for the new user
+    // Create a new workspace for the new user
     const workspace = new WorkspaceModel({
       name: `My Workspace`,
       description: `Workspace created for ${user.name}`,
@@ -163,4 +172,33 @@ export const registerUserService = async (body: {
     session.endSession();
     console.log("End Session...");
   }
+};
+
+
+export const verifyUserService = async ({
+  email,
+  password,
+  provider = ProviderEnum.EMAIL,
+}: {
+  email: string;
+  password: string;
+  provider?: string;
+}) => {
+  const account = await AccountModel.findOne({ provider, providerId: email });
+  if (!account) {
+    throw new NotFoundException("Invalid email or password");
+  }
+
+  const user = await UserModel.findById(account.userId);
+
+  if (!user) {
+    throw new NotFoundException("User not found for the given account");
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    throw new UnauthorizedException("Invalid email or password");
+  }
+
+  return user.omitPassword();
 };

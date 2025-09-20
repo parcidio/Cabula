@@ -37,6 +37,6 @@ export const asyncHandler =
     try {
       await controller(req, res, next);
     } catch (error) {
-      next(error);
+      next(error); // Pass the error to the next middleware
     }
   };

@@ -14,12 +14,16 @@ import passport from "passport";
 
 //import { version } from "os";
 import authRoutes from "./routes/auth.route";
+import userRoutes from "./routes/user.route";
+import isAuthenticated from "./middlewares/isAuthenticated.middleware";
 //import userRoutes from "./routes/user.route";
 //import isAuthenticated from "./middlewares/isAuthenticated.middleware";
-//import workspaceRoutes from "./routes/workspace.route";
+import workspaceRoutes from "./routes/workspace.route";
+import memberRoutes from "./routes/member.route";
+import ProjectRoutes from "./routes/project.route";
 //import memberRoutes from "./routes/member.route";
 //import projectRoutes from "./routes/project.route";
-//import taskRoutes from "./routes/task.route";
+import taskRoutes from "./routes/task.route";
 
 // Create an Express application that will handle incoming requests and responses
 const app = express();
@@ -70,11 +74,11 @@ app.get(
 
 // API routing
 app.use(`${BASE_PATH}/auth`, authRoutes);
-//app.use(`${BASE_PATH}/user`, isAuthenticated, userRoutes);
-//app.use(`${BASE_PATH}/workspace`, isAuthenticated, workspaceRoutes);
-//app.use(`${BASE_PATH}/member`, isAuthenticated, memberRoutes);
-//app.use(`${BASE_PATH}/project`, isAuthenticated, projectRoutes);
-//app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
+app.use(`${BASE_PATH}/user`, isAuthenticated, userRoutes);
+app.use(`${BASE_PATH}/workspace`, isAuthenticated, workspaceRoutes);
+app.use(`${BASE_PATH}/member`, isAuthenticated, memberRoutes);
+app.use(`${BASE_PATH}/project`, isAuthenticated, ProjectRoutes);
+app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

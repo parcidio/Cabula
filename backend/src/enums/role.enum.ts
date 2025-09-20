@@ -9,7 +9,6 @@ export type RoleEnumType = keyof typeof RoleEnum;
 
 export const PermissionEnum = {
 
-
     CREATE_WORKSPACE: 'CREATE_WORKSPACE',
     DELETE_WORKSPACE: 'DELETE_WORKSPACE',
     EDIT_WORKSPACE: 'EDIT_WORKSPACE',

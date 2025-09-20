@@ -1,3 +1,7 @@
+/** Error handling middleware for Express applications. 
+ * It handles errors thrown in the application and sends appropriate responses to the client.
+ */
+
 import { ErrorRequestHandler, Response } from "express";
 import { HTTPSTATUS } from "../config/http.config";
 import { AppError } from "../utils/appError";
