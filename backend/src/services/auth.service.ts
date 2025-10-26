@@ -9,108 +9,93 @@ import MemberModel from "../models/member.model";
 import { ProviderEnum } from "../enums/account-provider.enum";
 
 export const loginOrCreateAccountService = async (data: {
-    provider: string,
-    displayName: string,
-    providerId: string,
-    picture?: string,
-    email?: string,
+  provider: string;
+  displayName: string;
+  providerId: string;
+  picture?: string;
+  email?: string;
 }) => {
-    const { provider, displayName, providerId, picture, email } = data;
-    console.log("loginOrCreateAccountService called with data:", data);
+  const { providerId, provider, displayName, email, picture } = data;
 
-    // Start a database session for transaction management
-    const session = await mongoose.startSession();
+  const session = await mongoose.startSession();
 
-    try {
-        // Check if the user already exists in the database
-        let user = await UserModel.findOne({ email }).session(session);
-        if (!user) {
-            session.startTransaction();
-            console.log("Starting transaction...");
+  try {
+    session.startTransaction();
+    console.log("Started Session...");
 
-            // Create a new user
-            user = new UserModel({
-                email,
-                name: displayName,
-                profilePicture: picture || null,
-            });
-            await user.save({ session });
+    let user = await UserModel.findOne({ email }).session(session);
 
-            // Create a new account associated with the user
-            const account = new AccountModel({
-                userId: user._id,
-                provider: provider,
-                providerId: providerId,
-            });
-            await account.save({ session });
+    if (!user) {
+      // Create a new user if it doesn't exist
+      user = new UserModel({
+        email,
+        name: displayName,
+        profilePicture: picture || null,
+      });
+      await user.save({ session });
 
-            // Create a new workspace for the user
-            const workspace = new WorkspaceModel({
-                name: `My Workspace`,
-                description: `Worspace create for ${user.name}`,
-                owner: user._id,
-            });
-            await workspace.save({ session });
+      const account = new AccountModel({
+        userId: user._id,
+        provider: provider,
+        providerId: providerId,
+      });
+      await account.save({ session });
 
-            //Check if the owner role exists
-            const ownerRole = await RoleModel.findOne({ name: RoleEnum.OWNER }).session(session);
-            if (!ownerRole) {
-                throw new NotFoundException("Owner role not found");
-            }
+      // 3. Create a new workspace for the new user
+      const workspace = new WorkspaceModel({
+        name: `My Workspace`,
+        description: `Workspace created for ${user.name}`,
+        owner: user._id,
+      });
+      await workspace.save({ session });
 
-            // Create a new member with the owner role for the user in the workspace
-            const member = new MemberModel({
-                userId: user._id,
-                workspaceId: workspace._id,
-                role: ownerRole._id,
-                joinedAt: new Date(),
-            });
+      const ownerRole = await RoleModel.findOne({
+        name: RoleEnum.OWNER,
+      }).session(session);
 
-            await member.save({ session });
+      if (!ownerRole) {
+        throw new NotFoundException("Owner role not found");
+      }
 
-            // Make the workspace the user's current workspace
-            user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
-            await user.save({ session });
+      const member = new MemberModel({
+        userId: user._id,
+        workspaceId: workspace._id,
+        role: ownerRole._id,
+        joinedAt: new Date(),
+      });
+      await member.save({ session });
 
-        }
-      
-        // Commit all changes in the transaction
-        await session.commitTransaction();
-        console.log("Transaction committed successfully.");
-        return { user: user };
-    } catch (error) {
-        await session.abortTransaction();
-        console.error("Error in loginOrCreateAccountService:", error);
-        throw error; // Rethrow the error to be handled by the caller
-    } finally {
-        session.endSession();
-        console.log("Session ended.");
+      user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
+      await user.save({ session });
     }
+    await session.commitTransaction();
+    session.endSession();
+    console.log("End Session...");
 
+    return { user };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  } finally {
+    session.endSession();
+  }
 };
 
 export const registerUserService = async (body: {
-  email: string,
-  name: string,
-  password: string,
+  email: string;
+  name: string;
+  password: string;
 }) => {
-    const { email, name, password } = body;
-    const session = await mongoose.startSession();
+  const { email, name, password } = body;
+  const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
-    // Check if the user already exists in the database
     const existingUser = await UserModel.findOne({ email }).session(session);
     if (existingUser) {
       throw new BadRequestException("Email already exists");
-    }
-
-    
-    // Check if an account with the same providerId already exists
-    const existingAccount = await AccountModel.findOne({ providerId: email }).session(session);
-    if (existingAccount) {
-      throw new BadRequestException("Account with this email already exists");
     }
 
     const user = new UserModel({
@@ -125,10 +110,9 @@ export const registerUserService = async (body: {
       provider: ProviderEnum.EMAIL,
       providerId: email,
     });
-    console.log("Account created:", account);
     await account.save({ session });
 
-    // Create a new workspace for the new user
+    // 3. Create a new workspace for the new user
     const workspace = new WorkspaceModel({
       name: `My Workspace`,
       description: `Workspace created for ${user.name}`,
@@ -156,8 +140,8 @@ export const registerUserService = async (body: {
     await user.save({ session });
 
     await session.commitTransaction();
-    console.log("Transaction committed successfully.");
-    console.log("User registered successfully");
+    session.endSession();
+    console.log("End Session...");
 
     return {
       userId: user._id,
@@ -165,15 +149,11 @@ export const registerUserService = async (body: {
     };
   } catch (error) {
     await session.abortTransaction();
-    console.error("Error in registerUserService:", error);
+    session.endSession();
 
     throw error;
-  }finally {
-    session.endSession();
-    console.log("End Session...");
   }
 };
-
 
 export const verifyUserService = async ({
   email,
