@@ -1,4 +1,5 @@
 import Logo from "@/components/logo";
+import AppName from "@/components/logo/app-name";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,7 +15,7 @@ const GoogleOAuthFailure = () => {
           className="flex items-center gap-2 self-center font-medium"
         >
           <Logo />
-          Team Sync.
+          <AppName/>
         </Link>
         <div className="flex flex-col gap-6"></div>
       </div>
