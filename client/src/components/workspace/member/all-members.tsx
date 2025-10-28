@@ -24,6 +24,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { changeWorkspaceMemberRoleMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Permissions } from "@/constant";
+
 const AllMembers = () => {
   const { user, hasPermission } = useAuthContext();
 
@@ -34,6 +35,7 @@ const AllMembers = () => {
 
   const { data, isPending } = useGetWorkspaceMembers(workspaceId);
   const members = data?.members || [];
+  console.log(members)
   const roles = data?.roles || [];
 
   const { mutate, isPending: isLoading } = useMutation({
@@ -42,6 +44,23 @@ const AllMembers = () => {
 
   const handleSelect = (roleId: string, memberId: string) => {
     if (!roleId || !memberId) return;
+
+    // --- LOGIC TO HANDLE "NULL" SELECTION ---
+    if (roleId === "__REMOVE_ROLE__") {
+      // ⚠️ IMPORTANT: Implement your actual API logic for setting role to null or removing the role here.
+      // This often requires calling the mutation with `roleId: null` or calling a different "remove member role" API.
+      
+      toast({
+        title: "Role Removal Placeholder",
+        description: "API call to remove the member's role needs to be implemented here.",
+        variant: "default",
+      });
+      // Return early to prevent calling the change role API with the sentinel value
+      return;
+    }
+    // ----------------------------------------
+
+
     const payload = {
       workspaceId,
       data: {
@@ -49,6 +68,7 @@ const AllMembers = () => {
         memberId,
       },
     };
+
     mutate(payload, {
       onSuccess: () => {
         queryClient.invalidateQueries({
@@ -81,7 +101,7 @@ const AllMembers = () => {
         const initials = getAvatarFallbackText(name);
         const avatarColor = getAvatarColor(name);
         return (
-          <div className="flex items-center justify-between space-x-4">
+          <div key={member.userId._id} className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
               <Avatar className="h-8 w-8">
                 <AvatarImage
@@ -112,7 +132,7 @@ const AllMembers = () => {
                       member.userId._id === user?._id
                     }
                   >
-                    {member.role.name?.toLowerCase()}{" "}
+                    {member.role?.name?.toLowerCase() || "no role"}{" "} {/* Display "no role" if role is missing/null */}
                     {canChangeMemberRole && member.userId._id !== user?._id && (
                       <ChevronDown className="text-muted-foreground" />
                     )}
@@ -133,13 +153,35 @@ const AllMembers = () => {
                           <>
                             <CommandEmpty>No roles found.</CommandEmpty>
                             <CommandGroup>
+                              {/* NEW: Option to simulate 'null' by removing the role */}
+                              {member.role?.name !== "OWNER" && ( // Owners typically cannot have their role removed/nullified
+                                <CommandItem
+                                  key="__REMOVE_ROLE__"
+                                  disabled={isLoading}
+                                  className="disabled:pointer-events-none  gap-1 mb-1 flex flex-col items-start px-4 py-2 cursor-pointer text-red-600"
+                                  onSelect={() => {
+                                    handleSelect(
+                                      "__REMOVE_ROLE__", // Sentinel ID for role removal
+                                      member.userId._id
+                                    );
+                                  }}
+                                >
+                                  <p className="font-semibold capitalize text-red-400">
+                                    Remove Role
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Clear the member's assigned role.
+                                  </p>
+                                </CommandItem>
+                              )}
+                              
                               {roles?.map(
                                 (role) =>
                                   role.name !== "OWNER" && (
                                     <CommandItem
                                       key={role._id}
                                       disabled={isLoading}
-                                      className="disabled:pointer-events-none gap-1 mb-1  flex flex-col items-start px-4 py-2 cursor-pointer"
+                                      className="disabled:pointer-events-none gap-1 mb-1 flex flex-col items-start px-4 py-2 cursor-pointer"
                                       onSelect={() => {
                                         handleSelect(
                                           role._id,
@@ -155,7 +197,9 @@ const AllMembers = () => {
                                           `Can view, create, edit tasks, project and manage settings .`}
 
                                         {role.name === "MEMBER" &&
-                                          `Can view,edit only task created by.`}
+                                          `Can view, edit only task created by.`}
+
+                                        {role.name === "GUEST" && `Can view only.`}
                                       </p>
                                     </CommandItem>
                                   )

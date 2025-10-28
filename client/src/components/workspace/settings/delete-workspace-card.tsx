@@ -43,10 +43,10 @@ const DeleteWorkspaceCard = () => {
   };
   return (
     <>
-      {/*<PermissionsGuard
+      <PermissionsGuard
           showMessage
           requiredPermission={Permissions.DELETE_WORKSPACE}
-        >*/}
+        >
       <div className="w-full">
         <div className="mb-5 border-b">
           <h1
@@ -88,7 +88,7 @@ const DeleteWorkspaceCard = () => {
         confirmText="Delete"
         cancelText="Cancel"
       />
-        {/*</PermissionsGuard>*/}
+       </PermissionsGuard>
 
     </>
   );
