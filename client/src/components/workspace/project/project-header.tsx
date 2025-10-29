@@ -1,60 +1,43 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useParams } from "react-router-dom";
-import CreateTaskDialog from "../task/create-task-dialog";
-import EditProjectDialog from "./edit-project-dialog";
+import AnalyticsCard from "../common/analytics-card";
 import useWorkspaceId from "@/hooks/use-workspace-id";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getProjectByIdQueryFn } from "@/lib/api";
-import PermissionsGuard from "@/components/resuable/permission-guard";
-import { Permissions } from "@/constant";
+import { useQuery } from "@tanstack/react-query";
+import { getProjectAnalyticsQueryFn } from "@/lib/api";
 
-const ProjectHeader = () => {
+const ProjectAnalytics = () => {
   const param = useParams();
   const projectId = param.projectId as string;
 
   const workspaceId = useWorkspaceId();
 
-  const { data, isPending, isError } = useQuery({
-    queryKey: ["singleProject", projectId],
-    queryFn: () =>
-      getProjectByIdQueryFn({
-        workspaceId,
-        projectId,
-      }),
-    staleTime: Infinity,
+  const { data, isPending } = useQuery({
+    queryKey: ["project-analytics", projectId],
+    queryFn: () => getProjectAnalyticsQueryFn({ workspaceId, projectId }),
+    staleTime: 0,
     enabled: !!projectId,
-    placeholderData: keepPreviousData,
   });
 
-  const project = data?.project;
+  const analytics = data?.analytics;
 
-  // Fallback if no project data is found
-  const projectEmoji = project?.emoji || "📊";
-  const projectName = project?.name || "Untitled project";
-
-  const renderContent = () => {
-    if (isPending) return <span>Loading...</span>;
-    if (isError) return <span>Error occured</span>;
-    return (
-      <>
-        <span>{projectEmoji}</span>
-        {projectName}
-      </>
-    );
-  };
   return (
-    <div className="flex items-center justify-between space-y-2">
-      <div className="flex items-center gap-2">
-        <h2 className="flex items-center gap-3 text-xl font-medium truncate tracking-tight">
-          {renderContent()}
-        </h2>
-        <PermissionsGuard requiredPermission={Permissions.EDIT_PROJECT}>
-          <EditProjectDialog project={project} />
-        </PermissionsGuard>
-      </div>
-      <CreateTaskDialog projectId={projectId} />
+    <div className="grid gap-4 md:gap-5 lg:grid-cols-2 xl:grid-cols-3">
+      <AnalyticsCard
+        isLoading={isPending}
+        title="Total Task"
+        value={analytics?.totalTasks || 0}
+      />
+      <AnalyticsCard
+        isLoading={isPending}
+        title="Overdue Task"
+        value={analytics?.overdueTasks || 0}
+      />
+      <AnalyticsCard
+        isLoading={isPending}
+        title="Completed Task"
+        value={analytics?.completedTasks || 0}
+      />
     </div>
   );
 };
 
-export default ProjectHeader;
+export default ProjectAnalytics;
