@@ -155,7 +155,7 @@ export function NavProjects() {
                 <SidebarMenuItem key={item._id}>
                   <SidebarMenuButton asChild isActive={projectUrl === pathname}>
                     <Link to={projectUrl}>
-                      {item.emoji}
+                      {item.imoji}
                       <span>{item.name}</span>
                     </Link>
                   </SidebarMenuButton>

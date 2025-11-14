@@ -153,7 +153,7 @@ export type RoleType = {
 export type ProjectType = {
   _id: string;
   name: string;
-  emoji: string;
+  imoji: string;
   description: string;
   workspace: string;
   createdBy: {
@@ -168,7 +168,7 @@ export type ProjectType = {
 export type CreateProjectPayloadType = {
   workspaceId: string;
   data: {
-    emoji: string;
+    imoji: string;
     name: string;
     description: string;
   };
@@ -183,7 +183,7 @@ export type EditProjectPayloadType = {
   workspaceId: string;
   projectId: string;
   data: {
-    emoji: string;
+    imoji: string;
     name: string;
     description: string;
   };
@@ -249,7 +249,7 @@ export type TaskType = {
   description?: string;
   project?: {
     _id: string;
-    emoji: string;
+    imoji: string;
     name: string;
   };
   priority: TaskPriorityEnumType;

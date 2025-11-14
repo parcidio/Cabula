@@ -6,13 +6,13 @@ export const descriptionSchema = z.string().trim().optional();
 export const projectIdSchema = z.string().trim().min(1);
 
 export const createProjectSchema = z.object({
-    emoji: emojiSchema,
+    imoji: emojiSchema,
     name: nameSchema,
     description: descriptionSchema,
 });
 
 export const updateProjectSchema = z.object({
-    emoji: emojiSchema,
+    imoji: emojiSchema,
     name: nameSchema,
     description: descriptionSchema,
 });

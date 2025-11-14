@@ -140,6 +140,7 @@ export const editProjectMutationFn = async ({
   workspaceId,
   data,
 }: EditProjectPayloadType): Promise<ProjectResponseType> => {
+  console.log("selected imoji", data);
   const response = await API.put(
     `/project/${projectId}/workspace/${workspaceId}/update`,
     data

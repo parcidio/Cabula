@@ -35,7 +35,7 @@ export default function CreateProjectForm({
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceId();
 
-  const [emoji, setEmoji] = useState("📊");
+  const [imoji, setEmoji] = useState("📊");
 
   const { mutate, isPending } = useMutation({
     mutationFn: createProjectMutationFn,
@@ -56,8 +56,8 @@ export default function CreateProjectForm({
     },
   });
 
-  const handleEmojiSelection = (emoji: string) => {
-    setEmoji(emoji);
+  const handleEmojiSelection = (imoji: string) => {
+    setEmoji(imoji);
   };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -65,7 +65,7 @@ export default function CreateProjectForm({
     const payload = {
       workspaceId,
       data: {
-        emoji,
+        imoji: imoji,
         ...values,
       },
     };
@@ -121,7 +121,7 @@ export default function CreateProjectForm({
                     variant="outline"
                     className="font-normal size-[60px] !p-2 !shadow-none mt-2 items-center rounded-full "
                   >
-                    <span className="text-4xl">{emoji}</span>
+                    <span className="text-4xl">{imoji}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className=" !p-0">

@@ -34,7 +34,7 @@ export default function EditProjectForm(props: {
   const workspaceId = useWorkspaceId();
   const queryClient = useQueryClient();
 
-  const [emoji, setEmoji] = useState("📊");
+  const [imoji, setEmoji] = useState("📊");
 
   const projectId = project?._id as string;
 
@@ -59,7 +59,7 @@ export default function EditProjectForm(props: {
 
   useEffect(() => {
     if (project) {
-      setEmoji(project.emoji);
+      setEmoji(project.imoji);
       form.setValue("name", project.name);
       form.setValue("description", project.description);
     }
@@ -74,7 +74,7 @@ export default function EditProjectForm(props: {
     const payload = {
       projectId,
       workspaceId,
-      data: { emoji, ...values },
+      data: { imoji: imoji, ...values },
     };
     mutate(payload, {
       onSuccess: (data) => {
@@ -130,7 +130,7 @@ export default function EditProjectForm(props: {
                     variant="outline"
                     className="font-normal size-[60px] !p-2 !shadow-none mt-2 items-center rounded-full "
                   >
-                    <span className="text-4xl">{emoji}</span>
+                    <span className="text-4xl">{imoji}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className=" !p-0">

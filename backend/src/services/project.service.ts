@@ -7,13 +7,13 @@ import { NotFoundException } from "../utils/appError";
 export const createProjectService = async ( userId: string,
   workspaceId: string,
   body: {
-    emoji?: string;
+    imoji?: string;
     name: string;
     description?: string;
   }) => {
     
     const project = new ProjectModel({
-    ...(body.emoji && { emoji: body.emoji }),
+    ...(body.imoji && { imoji: body.imoji }),
     name: body.name,
     description: body.description,
     workspace: workspaceId,
@@ -58,7 +58,7 @@ export const getProjectByIdAndWorkspaceIdService = async (
   const project = await ProjectModel.findOne({
     _id: projectId,
     workspace: workspaceId,
-  }).select("_id emoji name description");
+  }).select("_id imoji name description");
 
   if (!project) {
     throw new NotFoundException(
@@ -135,12 +135,12 @@ export const updateProjectService = async (
   workspaceId: string,
   projectId: string,
   body: {
-    emoji?: string;
+    imoji?: string;
     name: string;
     description?: string;
   }
 ) => {
-  const { name, emoji, description } = body;
+  const { name, imoji, description } = body;
 
   const project = await ProjectModel.findOne({
     _id: projectId,
@@ -153,7 +153,7 @@ export const updateProjectService = async (
     );
   }
 
-  if (emoji) project.imoji = emoji;
+  if (imoji) project.imoji = imoji;
   if (name) project.name = name;
   if (description) project.description = description;
 

@@ -70,7 +70,7 @@ export default function CreateTaskForm(props: {
     return {
       label: (
         <div className="flex items-center gap-1">
-          <span>{project.emoji}</span>
+          <span>{project.imoji}</span>
           <span>{project.name}</span>
         </div>
       ),

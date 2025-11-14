@@ -5,16 +5,16 @@ import data from "@emoji-mart/data";
 import { customEmojis } from "./custom-emojis";
 
 interface EmojiPickerComponentProps {
-  onSelectEmoji: (emoji: string) => void;
+  onSelectEmoji: (imoji: string) => void;
 }
 
 const EmojiPickerComponent: React.FC<EmojiPickerComponentProps> = ({
   onSelectEmoji,
 }) => {
-  // Handle emoji selection
-  const handleEmojiSelect = (emoji: { native: string }) => {
-    console.log(emoji, "emoji");
-    onSelectEmoji(emoji.native); // Pass the selected emoji to parent component
+  // Handle imoji selection
+  const handleEmojiSelect = (imoji: { native: string }) => {
+    console.log(imoji, "imoji");
+    onSelectEmoji(imoji.native); // Pass the selected imoji to parent component
   };
 
   return (
