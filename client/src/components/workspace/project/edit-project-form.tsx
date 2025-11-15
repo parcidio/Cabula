@@ -74,7 +74,7 @@ export default function EditProjectForm(props: {
     const payload = {
       projectId,
       workspaceId,
-      data: { imoji: imoji, ...values },
+      data: { imoji, ...values },
     };
     mutate(payload, {
       onSuccess: (data) => {

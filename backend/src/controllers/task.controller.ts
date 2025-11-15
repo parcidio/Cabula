@@ -70,8 +70,8 @@ export const getAllTasksController = asyncHandler(
       priority: req.query.priority
         ? (req.query.priority as string)?.split(",")
         : undefined,
-      assignedTo: req.query.assignedTo
-        ? (req.query.assignedTo as string)?.split(",")
+      assignee: req.query.assignee
+        ? (req.query.assignee as string)?.split(",")
         : undefined,
       keyword: req.query.keyword as string | undefined,
       dueDate: req.query.dueDate as string | undefined,

@@ -26,7 +26,7 @@ export const createTaskSchema = z.object({
   description: description,
   status: statusSchema,
   priority: prioritySchema,
-  assignedTo: assigneeSchema,
+  assignee: assigneeSchema,
   dueDate: dueDateSchema,
 });
 
@@ -35,7 +35,7 @@ title: titleSchema,
   description: description,
   status: statusSchema,
   priority: prioritySchema,
-  assignedTo: assigneeSchema,
+  assignee: assigneeSchema,
   dueDate: dueDateSchema,
 
 

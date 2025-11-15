@@ -7,13 +7,15 @@ import {
   CheckCircle,
   Circle,
   HelpCircle,
+  Blocks,
   Timer,
   View,
 } from "lucide-react";
 
 const statusIcons = {
-  [TaskStatusEnum.BACKLOG]: HelpCircle,
-  [TaskStatusEnum.TODO]: Circle,
+  [TaskStatusEnum.BACKLOG]: Blocks,
+  [TaskStatusEnum.BLOCKED]: HelpCircle,
+  [TaskStatusEnum.TO_DO]: Circle,
   [TaskStatusEnum.IN_PROGRESS]: Timer,
   [TaskStatusEnum.IN_REVIEW]: View,
   [TaskStatusEnum.DONE]: CheckCircle,

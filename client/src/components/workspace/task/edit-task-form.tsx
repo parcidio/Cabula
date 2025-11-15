@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -69,7 +68,7 @@ export default function EditTaskForm({ task, onClose }: { task: TaskType; onClos
     description: z.string().trim(),
     status: z.enum(Object.values(TaskStatusEnum) as [keyof typeof TaskStatusEnum]),
     priority: z.enum(Object.values(TaskPriorityEnum) as [keyof typeof TaskPriorityEnum]),
-    assignedTo: z.string().trim().min(1, { message: "AssignedTo is required" }),
+    assignee: z.string().trim().min(1, { message: "Assignee is required" }),
     dueDate: z.date({ required_error: "A due date is required." }),
   });
 
@@ -80,7 +79,7 @@ export default function EditTaskForm({ task, onClose }: { task: TaskType; onClos
       description: task?.description ?? "",
       status: task?.status ?? "TODO",
       priority: task?.priority ?? "MEDIUM",
-      assignedTo: task.assignedTo?._id ?? "",
+      assignee: task.assignee?._id ?? "",
       dueDate: task?.dueDate ? new Date(task.dueDate) : new Date(),
     },
   });
@@ -145,7 +144,7 @@ export default function EditTaskForm({ task, onClose }: { task: TaskType; onClos
             )} />
 
             {/* Assigned To */}
-            <FormField control={form.control} name="assignedTo" render={({ field }) => (
+            <FormField control={form.control} name="assignee" render={({ field }) => (
               <FormItem>
                 <FormLabel>Assigned To</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>

@@ -224,7 +224,7 @@ export const getAllTasksQueryFn = async ({
   workspaceId,
   keyword,
   projectId,
-  assignedTo,
+  assignee,
   priority,
   status,
   dueDate,
@@ -236,7 +236,7 @@ export const getAllTasksQueryFn = async ({
   const queryParams = new URLSearchParams();
   if (keyword) queryParams.append("keyword", keyword);
   if (projectId) queryParams.append("projectId", projectId);
-  if (assignedTo) queryParams.append("assignedTo", assignedTo);
+  if (assignee) queryParams.append("assignee", assignee);
   if (priority) queryParams.append("priority", priority);
   if (status) queryParams.append("status", status);
   if (dueDate) queryParams.append("dueDate", dueDate);

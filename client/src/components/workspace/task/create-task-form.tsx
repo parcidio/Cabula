@@ -118,8 +118,8 @@ export default function CreateTaskForm(props: {
         required_error: "Priority is required",
       }
     ),
-    assignedTo: z.string().trim().min(1, {
-      message: "AssignedTo is required",
+    assignee: z.string().trim().min(1, {
+      message: "assignee is required",
     }),
     dueDate: z.date({
       required_error: "A date of birth is required.",
@@ -148,6 +148,7 @@ export default function CreateTaskForm(props: {
       projectId: values.projectId,
       data: {
         ...values,
+        
         dueDate: values.dueDate.toISOString(),
       },
     };
@@ -293,7 +294,7 @@ export default function CreateTaskForm(props: {
             <div>
               <FormField
                 control={form.control}
-                name="assignedTo"
+                name="assignee"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assigned To</FormLabel>

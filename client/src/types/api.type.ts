@@ -221,7 +221,7 @@ export type CreateTaskPayloadType = {
     description: string;
     priority: TaskPriorityEnumType;
     status: TaskStatusEnumType;
-    assignedTo: string;
+    assignee: string;
     dueDate: string;
   };
 };
@@ -237,7 +237,7 @@ export type EditTaskPayloadType = {
     description: string;
     priority: TaskPriorityEnumType;
     status: TaskStatusEnumType;
-    assignedTo: string;
+    assignee: string;
     dueDate: string;
   }>;
 };
@@ -254,7 +254,7 @@ export type TaskType = {
   };
   priority: TaskPriorityEnumType;
   status: TaskStatusEnumType;
-  assignedTo: {
+  assignee: {
     _id: string;
     name: string;
     profilePicture: string | null;
@@ -272,7 +272,7 @@ export type AllTaskPayloadType = {
   keyword?: string | null;
   priority?: TaskPriorityEnumType | null;
   status?: TaskStatusEnumType | null;
-  assignedTo?: string | null;
+  assignee?: string | null;
   dueDate?: string | null;
   pageNumber?: number | null;
   pageSize?: number | null;

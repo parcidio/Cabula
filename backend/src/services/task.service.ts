@@ -14,20 +14,20 @@ export const createTaskService = async (
         description?: string;
         status: string;
         priority: string;
-        assignedTo?: string | null;
+        assignee?: string | null;
         dueDate?: string | null;
     }
 ) => {
-   const {title, description, status, priority, assignedTo, dueDate} = body; 
+   const {title, description, status, priority, assignee, dueDate} = body; 
    const project = await ProjectModel.findById(projectId);
    
    if(!project ||project.workspace.toString() !== workspaceId) {
        throw new Error("Project not found or does not belong to this workspace");
    }
 
-   if(assignedTo){
+   if(assignee){
     const isAssignedUserMember = await MemberModel.exists({
-        userId: assignedTo,
+        userId: assignee,
         workspaceId
     });
 
@@ -42,7 +42,7 @@ export const createTaskService = async (
         description,
         status: status || TaskStatusEnum.TO_DO,
         priority: priority || TaskPriorityEnum.MEDIUM,
-        assigneed: assignedTo,
+        assignee: assignee,
         dueDate,
         workspace: workspaceId,
         project: projectId,
@@ -64,7 +64,7 @@ export const updateTaskService = async (
     description?: string;
     priority: string;
     status: string;
-    assignedTo?: string | null;
+    assignee?: string | null;
     dueDate?: string;
   }
 ) => {
@@ -87,6 +87,7 @@ export const updateTaskService = async (
   const updatedTask = await TaskModel.findByIdAndUpdate(
     taskId,
     {
+      assignee: body.assignee,
       ...body,
     },
     { new: true }
@@ -105,7 +106,7 @@ export const getAllTasksService = async (
     projectId?: string;
     status?: string[];
     priority?: string[];
-    assignedTo?: string[];
+    assignee?: string[];
     keyword?: string;
     dueDate?: string;
   },
@@ -130,8 +131,8 @@ export const getAllTasksService = async (
     query.priority = { $in: filters.priority };
   }
 
-  if (filters.assignedTo && filters.assignedTo?.length > 0) {
-    query.assignedTo = { $in: filters.assignedTo };
+  if (filters.assignee && filters.assignee?.length > 0) {
+    query.assignee = { $in: filters.assignee };
   }
 
   if (filters.keyword && filters.keyword !== undefined) {

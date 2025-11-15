@@ -51,7 +51,7 @@ const RecentTasks = () => {
 
       <ul role="list" className="divide-y divide-gray-200">
         {tasks.map((task) => {
-          const name = task?.assignedTo?.name || "";
+          const name = task?.assignee?.name || "";
           const initials = getAvatarFallbackText(name);
           const avatarColor = getAvatarColor(name);
           return (
@@ -96,8 +96,8 @@ const RecentTasks = () => {
               <div className="flex items-center space-x-2 ml-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage
-                    src={task.assignedTo?.profilePicture || ""}
-                    alt={task.assignedTo?.name}
+                    src={task.assignee?.profilePicture || ""}
+                    alt={task.assignee?.name}
                   />
                   <AvatarFallback className={avatarColor}>
                     {initials}

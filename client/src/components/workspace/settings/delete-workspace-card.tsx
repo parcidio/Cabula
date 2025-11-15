@@ -43,10 +43,6 @@ const DeleteWorkspaceCard = () => {
   };
   return (
     <>
-      <PermissionsGuard
-          showMessage
-          requiredPermission={Permissions.DELETE_WORKSPACE}
-        >
       <div className="w-full">
         <div className="mb-5 border-b">
           <h1
@@ -57,7 +53,10 @@ const DeleteWorkspaceCard = () => {
           </h1>
         </div>
 
-      
+        <PermissionsGuard
+          showMessage
+          requiredPermission={Permissions.DELETE_WORKSPACE}
+        >
           <div className="flex flex-col items-start justify-between py-0">
             <div className="flex-1 mb-2">
               <p>
@@ -76,6 +75,7 @@ const DeleteWorkspaceCard = () => {
               Delete Workspace
             </Button>
           </div>
+        </PermissionsGuard>
       </div>
 
       <ConfirmDialog
@@ -88,8 +88,6 @@ const DeleteWorkspaceCard = () => {
         confirmText="Delete"
         cancelText="Cancel"
       />
-       </PermissionsGuard>
-
     </>
   );
 };

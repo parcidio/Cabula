@@ -91,12 +91,12 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
           },
         ]),
     {
-      accessorKey: "assignedTo",
+      accessorKey: "assignee",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Assigned To" />
       ),
       cell: ({ row }) => {
-        const assignee = row.original.assignedTo || null;
+        const assignee = row.original.assignee || null;
         const name = assignee?.name || "";
 
         const initials = getAvatarFallbackText(name);

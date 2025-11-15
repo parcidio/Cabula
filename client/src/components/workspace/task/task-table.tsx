@@ -1,4 +1,3 @@
-
 import { FC, useState } from "react";
 import { getColumns } from "./table/columns";
 import { DataTable } from "./table/table";
@@ -55,7 +54,7 @@ const TaskTable = () => {
         priority: filters.priority,
         status: filters.status,
         projectId: projectId || filters.projectId,
-        assignedTo: filters.assigneeId,
+        assignee: filters.assigneeId,
         pageNumber,
         pageSize,
       }),
