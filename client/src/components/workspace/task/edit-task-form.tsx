@@ -34,6 +34,9 @@ import { editTaskMutationFn } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { TaskType } from "@/types/api.type";
+import { cn } from "@/lib/utils";
+import { getAvatarColor, getAvatarFallbackText, transformOptions } from "@/lib/helper";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function EditTaskForm({ task, onClose }: { task: TaskType; onClose: () => void }) {
   const queryClient = useQueryClient();
@@ -46,22 +49,34 @@ export default function EditTaskForm({ task, onClose }: { task: TaskType; onClos
   const { data: memberData } = useGetWorkspaceMembers(workspaceId);
   const members = memberData?.members || [];
 
-  // Members Dropdown Options
-  const membersOptions = members.map((member) => ({
-    label: member.userId?.name || "Unknown",
-    value: member.userId?._id || "",
-  }));
 
-  // Status & Priority Options
-  const statusOptions = Object.values(TaskStatusEnum).map((status) => ({
-    label: status.charAt(0) + status.slice(1).toLowerCase(),
-    value: status,
-  }));
+  // Workspace Memebers
+  const membersOptions = members?.map((member) => {
+    const name = member.userId?.name || "Unknown";
+    const initials = getAvatarFallbackText(name);
+    const avatarColor = getAvatarColor(name);
 
-  const priorityOptions = Object.values(TaskPriorityEnum).map((priority) => ({
-    label: priority.charAt(0) + priority.slice(1).toLowerCase(),
-    value: priority,
-  }));
+    return {
+      label: (
+        <div className="flex items-center space-x-2">
+          <Avatar className="h-7 w-7">
+            <AvatarImage src={member.userId?.profilePicture || ""} alt={name} />
+            <AvatarFallback className={avatarColor}>{initials}</AvatarFallback>
+          </Avatar>
+          <span>{name}</span>
+        </div>
+      ),
+      value: member.userId._id,
+    };
+  });
+
+  const taskStatusList = Object.values(TaskStatusEnum);
+  const taskPriorityList = Object.values(TaskPriorityEnum); // ["LOW", "MEDIUM", "HIGH", "URGENT"]
+
+  const statusOptions = transformOptions(taskStatusList);
+  const priorityOptions = transformOptions(taskPriorityList);
+
+
 
   const formSchema = z.object({
     title: z.string().trim().min(1, { message: "Title is required" }),
@@ -126,93 +141,213 @@ export default function EditTaskForm({ task, onClose }: { task: TaskType; onClos
         <Form {...form}>
           <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
             {/* Title */}
-            <FormField control={form.control} name="title" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Task Title</FormLabel>
-                <FormControl><Input {...field} placeholder="Task title" /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <div>
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-[#f1f7feb5] text-sm">
+                      Task title
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Website Redesign"
+                        className="!h-[48px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Description */}
-            <FormField control={form.control} name="description" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Task Description</FormLabel>
-                <FormControl><Textarea {...field} rows={2} placeholder="Description" /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-[#f1f7feb5] text-sm">
+                      Task description
+                      <span className="text-xs font-extralight ml-2">
+                        Optional
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea rows={1} placeholder="Description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
 
             {/* Assigned To */}
-            <FormField control={form.control} name="assignee" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Assigned To</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Select an assignee" /></SelectTrigger></FormControl>
-                  <SelectContent>
-                  <div className="w-full max-h-[200px] overflow-y-auto scrollbar">
-                    {membersOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                    ))}
-                    </div>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <div>
+              <FormField
+                control={form.control}
+                name="assignee"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assigned To</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a assignee" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <div
+                          className="w-full max-h-[200px]
+                           overflow-y-auto scrollbar
+                          "
+                        >
+                          {membersOptions?.map((option) => (
+                            <SelectItem
+                              className="cursor-pointer"
+                              key={option.value}
+                              value={option.value}
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </div>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Due Date */}
-            <FormField control={form.control} name="dueDate" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Due Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button variant="outline">
-                        {field.value ? format(field.value, "PPP") : "Pick a date"}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent>
-                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )} />
-
+            <div className="!mt-2">
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Due Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full flex-1 pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={
+                            (date) =>
+                              date <
+                              new Date(new Date().setHours(0, 0, 0, 0)) || // Disable past dates
+                              date > new Date("2100-12-31") //Prevent selection beyond a far future date
+                          }
+                          initialFocus
+                          defaultMonth={new Date()}
+                          fromMonth={new Date()}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             {/* Status */}
-            <FormField control={form.control} name="status" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    {statusOptions.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <div>
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            className="!text-muted-foreground !capitalize"
+                            placeholder="Select a status"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {statusOptions?.map((status) => (
+                          <SelectItem
+                            className="!capitalize"
+                            key={status.value}
+                            value={status.value}
+                          >
+                            {status.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Priority */}
-            <FormField control={form.control} name="priority" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Priority</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Select priority" /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    {priorityOptions.map((priority) => (
-                      <SelectItem key={priority.value} value={priority.value}>{priority.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <div>
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a priority" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {priorityOptions?.map((priority) => (
+                          <SelectItem
+                            className="!capitalize"
+                            key={priority.value}
+                            value={priority.value}
+                          >
+                            {priority.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending && <Loader className="animate-spin" />}

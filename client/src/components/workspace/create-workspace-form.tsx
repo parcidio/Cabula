@@ -150,11 +150,11 @@ export default function CreateWorkspaceForm({
           </form>
         </Form>
       </div>
-      <div
+      {/*<div
         className="relative flex-1 shrink-0 hidden bg-muted md:block
       bg-[url('/images/workspace.jpg')] bg-cover bg-center h-full
       "
-      />
+      />*/}
     </main>
   );
 }
