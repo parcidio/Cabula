@@ -26,6 +26,7 @@ import { loginMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
 import { useStore } from "@/store/store";
+import AppName from "@/components/logo/app-name";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const SignIn = () => {
           className="flex items-center gap-2 self-center font-medium"
         >
           <Logo />
-          Team Sync.
+          <AppName />
         </Link>
         <div className="flex flex-col gap-6">
           <Card>
@@ -185,10 +186,10 @@ const SignIn = () => {
               </Form>
             </CardContent>
           </Card>
-          <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
+          {/*<div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
             By clicking continue, you agree to our{" "}
             <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-          </div>
+          </div>*/}
         </div>
       </div>
     </div>
