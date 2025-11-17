@@ -7,7 +7,7 @@ export const getCurrentUserController = asyncHandler(
     async (req: Request, res: Response) => {
         const userId = req.user?._id;
 
-        const {user} = await getCurrentUserService(userId);
+        const { user } = await getCurrentUserService(userId);
 
         return res.status(HTTPSTATUS.OK).json({
             message: "Current user retrieved successfully",

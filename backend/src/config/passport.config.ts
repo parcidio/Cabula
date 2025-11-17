@@ -4,8 +4,12 @@ import { Strategy as GoogleStrategy, } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import { NotFoundException } from "../utils/appError";
 import { ProviderEnum } from "../enums/account-provider.enum";
-import { loginOrCreateAccountService, verifyUserService } from "../services/auth.service";
+import { findUserByIdService, loginOrCreateAccountService, verifyUserService } from "../services/auth.service";
 import { Verify } from "crypto";
+import { signJwtToken } from "../utils/jwt";
+
+import {Strategy as jwtStrategy, ExtractJwt,StrategyOptions} from "passport-jwt"
+import { config } from "./app.config";
 
 passport.use(
   new GoogleStrategy(
@@ -36,13 +40,13 @@ passport.use(
             email: email ,
         });
 
-
-
-        return done(null, user);
+        const jwt = signJwtToken({userId: user._id});
+        req.jwt = jwt;
+         done(null, user);
 
       }catch (error) {
         console.error("Error in Google strategy callback:", error);
-        return done(error, false);
+         done(error, false);
       }
     }
   )
@@ -54,7 +58,7 @@ passport.use(
     {
       usernameField: "email",
       passwordField: "password",
-      session: true,
+      session: false,
     },
     async (email, password, done) => {
       try {
@@ -67,6 +71,35 @@ passport.use(
   )
 );
 
+interface JwtPayload {
+  userId: string;
+}
+
+const options: StrategyOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: config.JWT_SECRET,
+  audience: ["user"],
+  algorithms: ["HS256"],  
+};
+
+passport.use(
+  new jwtStrategy(options, async (payload: JwtPayload, done) =>{
+    try{
+      const user = await findUserByIdService(payload.userId);
+      if(!user){
+        return done(null, false);
+      }
+      return done(null, user);
+    }catch(error){
+      return done(error, false);
+    }
+  }
+)
+)
+
 passport.serializeUser((user:any, done) => done(null, user));
 
 passport.deserializeUser(async (user:any, done) => done(null, user));
+
+//Middleware to authenticate requests using JWT strategy
+export const passportAuthenticateJWT = passport.authenticate("jwt", {session: false})

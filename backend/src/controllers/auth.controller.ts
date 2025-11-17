@@ -5,33 +5,40 @@ import { registerSchema } from "../validation/auth.validation";
 import { HTTPSTATUS } from "../config/http.config";
 import { registerUserService } from "../services/auth.service";
 import passport from "passport";
+import { signJwtToken } from "../utils/jwt";
 
 export const googleLoginCallback = asyncHandler(
-    async (req: Request, res: Response) => {
-        const currentWorkspace = req.user?.currentWorkspace;
+  async (req: Request, res: Response) => {
 
-        if (!currentWorkspace) {
-            return res.redirect(
-                `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`
-            );
-        }
+    const jwt = req.jwt;
+    const currentWorkspace = req.user?.currentWorkspace;
 
-        return res.redirect(
-            `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`
-        );
+    if (!jwt) {
+      return res.redirect(
+        `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`
+      );
     }
+
+    //return res.redirect(
+    //    `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`
+    //);
+
+    return res.redirect(
+      `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=sucess&access_token=${jwt}&current_workspace=${currentWorkspace}`
+    );
+  }
 );
 
 export const registerUserController = asyncHandler(async (req: Request, res: Response) => {
-    const body = registerSchema.parse({
-        ...req.body,
-    });
+  const body = registerSchema.parse({
+    ...req.body,
+  });
 
-    await registerUserService(body);
+  await registerUserService(body);
 
-    return res.status(HTTPSTATUS.CREATED).json({
-        message: "User created successfully",
-    });
+  return res.status(HTTPSTATUS.CREATED).json({
+    message: "User created successfully",
+  });
 });
 
 export const loginController = asyncHandler(
@@ -53,16 +60,21 @@ export const loginController = asyncHandler(
           });
         }
 
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
-          }
-
-          return res.status(HTTPSTATUS.OK).json({
-            message: "Logged in successfully",
-            user,
-          });
-        });
+        //req.logIn(user, (err) => {
+        //  if (err) {
+        //    return next(err);
+        //  }
+        //  return res.status(HTTPSTATUS.OK).json({
+        //    message: "Logged in successfully",
+        //    user,
+        //  });
+        //});
+        const access_token = signJwtToken({ userId: user._id });
+        return res.status(HTTPSTATUS.OK).json({
+          message: "User was logged in successfully!",
+          access_token,
+          user
+        })
       }
     )(req, res, next);
   }

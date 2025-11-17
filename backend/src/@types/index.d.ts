@@ -10,5 +10,9 @@ declare global {
             // `_id` can be of any type (not recommended; consider using a specific type like `string` or `ObjectId`)
             _id?: any;
         }
+
+        interface Request{
+            jwt?: string;            
+        }
     }
 }

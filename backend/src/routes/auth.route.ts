@@ -16,12 +16,15 @@ authRouters.post('/logout', logoutController);
 authRouters.get(
     '/google',
     passport.authenticate('google', {
-        scope: ['profile', 'email']
+        scope: ['profile', 'email'],
+        session: false,
     }));
+    
 authRouters.get(
     '/google/callback',
     passport.authenticate('google', {
-        failureRedirect: failedUrl
+        failureRedirect: failedUrl,
+        session: false,
     }),
     googleLoginCallback
 );
