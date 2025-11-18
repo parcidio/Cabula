@@ -122,6 +122,8 @@ const SignIn = () => {
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                  data-testid="email-input"
+                                  type="email"
                                   placeholder="m@example.com"
                                   className="!h-[48px]"
                                   {...field}
@@ -143,15 +145,16 @@ const SignIn = () => {
                                 <FormLabel className="dark:text-[#f1f7feb5] text-sm">
                                   Password
                                 </FormLabel>
-                                <a
+                                {/*<a
                                   href="#"
                                   className="ml-auto text-sm underline-offset-4 hover:underline"
                                 >
                                   Forgot your password?
-                                </a>
+                                </a>*/}
                               </div>
                               <FormControl>
                                 <Input
+                                data-testid="password-input"
                                   type="password"
                                   className="!h-[48px]"
                                   {...field}
@@ -167,6 +170,7 @@ const SignIn = () => {
                         disabled={isPending}
                         type="submit"
                         className="w-full"
+                        data-testid="login-button"
                       >
                         {isPending && <Loader className="animate-spin" />}
                         Login
@@ -175,6 +179,7 @@ const SignIn = () => {
                     <div className="text-center text-sm">
                       Don&apos;t have an account?{" "}
                       <Link
+                      data-testid="sign-up-link"
                         to="/sign-up"
                         className="underline underline-offset-4"
                       >

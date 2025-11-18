@@ -115,6 +115,7 @@ const SignUp = () => {
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                data-testid="signup-name-input"
                                   placeholder="Joh Doe"
                                   className="!h-[48px]"
                                   {...field}
@@ -137,6 +138,7 @@ const SignUp = () => {
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                data-testid="signup-email-input"
                                   placeholder="m@example.com"
                                   className="!h-[48px]"
                                   {...field}
@@ -159,6 +161,7 @@ const SignUp = () => {
                               </FormLabel>
                               <FormControl>
                                 <Input
+                                data-testid="signup-password-input"
                                   type="password"
                                   className="!h-[48px]"
                                   {...field}
@@ -171,6 +174,7 @@ const SignUp = () => {
                         />
                       </div>
                       <Button  disabled = {isPending}
+                      data-testid="sign-up-button"
                       type="submit" className="w-full">
                         {isPending && <Loader className="animate-spin"/>}
                         Sign up
@@ -178,7 +182,7 @@ const SignUp = () => {
                     </div>
                     <div className="text-center text-sm">
                       Already have an account?{" "}
-                      <Link to="/" className="underline underline-offset-4">
+                      <Link data-testid="sign-in-link" to="/" className="underline underline-offset-4">
                         Sign in
                       </Link>
                     </div>
