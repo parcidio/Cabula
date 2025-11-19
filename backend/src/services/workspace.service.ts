@@ -11,24 +11,24 @@ import ProjectModel from "../models/project.model";
 
 // Workspace creation service
 export const createWorkspaceService = async (
-    userId: string, 
-    body: { 
-        name: string;
-        description?: string | undefined;
-    }) => {
-    const {name, description} = body;
+  userId: string,
+  body: {
+    name: string;
+    description?: string | undefined;
+  }) => {
+  const { name, description } = body;
 
-    const user = await UserModel.findById(userId);
-    if (!user) {
-        throw new NotFoundException("User not found");
-    }
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
 
-    const ownerRole = await RoleModel.findOne({ name: RoleEnum.OWNER });
-    if (!ownerRole) {
-        throw new NotFoundException("Owner role not found");
-    }
+  const ownerRole = await RoleModel.findOne({ name: RoleEnum.OWNER });
+  if (!ownerRole) {
+    throw new NotFoundException("Owner role not found");
+  }
 
-    const workspace = new WorkspaceModel({
+  const workspace = new WorkspaceModel({
     name: name,
     description: description,
     owner: user._id,
@@ -55,41 +55,41 @@ export const createWorkspaceService = async (
 
 // Get all workspaces a user is a member of
 export const getAllWorkspacesUserIsAMemberService = async (userId: string) => {
-    const membership = await MemberModel.find({ userId }).populate("workspaceId").select("-password").exec();
+  const membership = await MemberModel.find({ userId }).populate("workspaceId").select("-password").exec();
 
-    // Map the membership to get the workspace details
-    const workspaces = membership.map(member => member.workspaceId);
-    return  workspaces ;
+  // Map the membership to get the workspace details
+  const workspaces = membership.map(member => member.workspaceId);
+  return workspaces;
 };
 
 // Get a workspace by ID
 export const getWorkspaceByIdService = async (workspaceId: string) => {
-    const workspace = await WorkspaceModel.findById({ _id: workspaceId});
-    if (!workspace) {
-        throw new NotFoundException("Workspace not found");
-    }
+  const workspace = await WorkspaceModel.findById({ _id: workspaceId });
+  if (!workspace) {
+    throw new NotFoundException("Workspace not found");
+  }
 
-    const members = await MemberModel.find({ workspaceId }).populate("role");
+  const members = await MemberModel.find({ workspaceId }).populate("role");
 
-    const workspaceWithMembers = {
-        ...workspace.toObject(), members
-    }
-    return { workspace: workspaceWithMembers };
+  const workspaceWithMembers = {
+    ...workspace.toObject(), members
+  }
+  return { workspace: workspaceWithMembers };
 };
 
 // Get all members of a workspace
 export const getWorkSpaceMembersService = async (workspaceId: string) => {
-    const workspace = await WorkspaceModel.findById(workspaceId);
-    if (!workspace) {
-        throw new NotFoundException("Workspace not found");
-    }
+  const workspace = await WorkspaceModel.findById(workspaceId);
+  if (!workspace) {
+    throw new NotFoundException("Workspace not found");
+  }
 
-    // Get all members in the workspace
-    const members = await MemberModel.find({ workspaceId }).populate("userId", "name email profilePicture -password").populate("role", "name");
+  // Get all members in the workspace
+  const members = await MemberModel.find({ workspaceId }).populate("userId", "name email profilePicture -password").populate("role", "name");
 
-    // Get all roles
-    const roles = await RoleModel.find({}, {name: 1, _id:1}).select("-permission").lean();
-    return { members, roles };
+  // Get all roles
+  const roles = await RoleModel.find({}, { name: 1, _id: 1 }).select("-permission").lean();
+  return { members, roles };
 };
 
 // Get the workspace analytics
@@ -131,19 +131,32 @@ export const changeMemberRoleService = async (
   if (!workspace) {
     throw new NotFoundException("Workspace not found");
   }
-
-  const role = await RoleModel.findById(roleId);
-  if (!role) {
-    throw new NotFoundException("Role not found");
-  }
-
   const member = await MemberModel.findOne({
     userId: memberId,
     workspaceId: workspaceId,
   });
 
+  if(roleId === "__REMOVE_ROLE__") {
+    //Remove the user from the workspace
+    if (!member) {
+      throw new NotFoundException("Member not found in the workspace");
+    }
+    await MemberModel.deleteOne({
+      userId: memberId,
+      workspaceId: workspaceId,
+    });
+    return { member };
+  }
+
+  const role = await RoleModel.findById(roleId);
+
+
   if (!member) {
     throw new Error("Member not found in the workspace");
+  }
+
+  if (!role) {
+    throw new NotFoundException("Role not found");
   }
 
   member.role = role;
@@ -182,7 +195,7 @@ export const deleteWorkspaceService = async (
   workspaceId: string,
   userId: string
 ) => {
-    
+
   const session = await mongoose.startSession();
   session.startTransaction(); // this will start a new transaction making it possible that all operations within this block are executed successfully or none at all
 
@@ -195,7 +208,7 @@ export const deleteWorkspaceService = async (
     }
 
     // Check if the user owns the workspace
-    if (!workspace.owner.equals(new mongoose.Types.ObjectId(userId))) { 
+    if (!workspace.owner.equals(new mongoose.Types.ObjectId(userId))) {
       throw new BadRequestException(
         "You are not authorized to delete this workspace"
       );

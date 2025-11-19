@@ -46,18 +46,18 @@ const AllMembers = () => {
     if (!roleId || !memberId) return;
 
     // --- LOGIC TO HANDLE "NULL" SELECTION ---
-    if (roleId === "__REMOVE_ROLE__") {
+    //if (roleId === "__REMOVE_ROLE__") {
       // ⚠️ IMPORTANT: Implement your actual API logic for setting role to null or removing the role here.
       // This often requires calling the mutation with `roleId: null` or calling a different "remove member role" API.
       
-      toast({
-        title: "Role Removal Placeholder",
-        description: "API call to remove the member's role needs to be implemented here.",
-        variant: "default",
-      });
+      //toast({
+        //title: "Role Removal Placeholder",
+        //description: "API call to remove the member's role needs to be implemented here.",
+        //variant: "default",
+      //});
       // Return early to prevent calling the change role API with the sentinel value
-      return;
-    }
+      //return;
+    //}
     // ----------------------------------------
 
 

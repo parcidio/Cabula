@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+cypress
+.next
+cypress.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
